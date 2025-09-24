@@ -20,13 +20,22 @@ return inertia::render('Principal/Prueba');
         return inertia::render('Principal/Welcome');
     }
 
-    public function index(){
-        $clientes=Cliente::all();
+public function index(Request $request)
+{
+    $query = Cliente::query();
+    //para realizar el query para el modelo de Cliente
 
-        return inertia::render('Principal/Sucursal/Cliente', [
-            'clientes' => $clientes,
-        ]);
+    if ($request->has('nombre_completo')) {
+        $query->where('nombre_completo', 'like', '%' . $request->nombre_completo . '%');
     }
+
+    $clientes = $query->paginate(10)->withQueryString();//añadir el query en la paginacion para que funcione la paginacion
+
+    return inertia::render('Principal/Sucursal/Cliente', [
+        'clientes' => $clientes,
+        'totalClientes' => $clientes->total(),
+    ]);
+}
 
     public function create(){
 
